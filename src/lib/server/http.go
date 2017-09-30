@@ -14,6 +14,7 @@ import (
 var stop chan bool = make(chan bool,1)
 
 type Http_Server struct {
+	Object  map[string]interface{}
 	Methods map[string]string
 }
 
@@ -22,6 +23,11 @@ type help_handle func(w http.ResponseWriter, r *http.Request)
 func init()  {
 
 
+}
+
+//通过外反射传入
+func (self *Http_Server)SetObject(p map[string]interface{})  {
+	self.Object = p
 }
 
 //反射调用控制器里面的方法
@@ -52,8 +58,6 @@ func (self *Http_Server)Run()  {
 	//http.HandleFunc("/admin/", adminHandler)
 	//http.HandleFunc("/login/",loginHandler)
 	//http.HandleFunc("/ajax/",ajaxHandler)
-
-
 	ports := []string{
 		":8888",
 		":8889",
@@ -73,9 +77,7 @@ func (self *Http_Server)Run()  {
 			if _,ok := <-stop;!ok {
 				fmt.Println("Http Server Stop.")
 			}else{
-
 				fmt.Println(server)
-
 				err := server.ListenAndServe()
 				if err != nil {
 					log.Fatal("ListenAndServe: ", err)
@@ -95,9 +97,9 @@ func (self *Http_Server)Run()  {
 	for _,v:=range route_strings{
 		s := strings.Split(v,"=>")
 		fmt.Println(strings.TrimSpace(s[0]))
-
 	}
 
+	fmt.Println(self.Object)
 	http.HandleFunc("test", cbc.Test)
 	http.HandleFunc("/admin/test", self.RunMethod(&admin.AdminController{}))
 	http.ListenAndServe(":8000", nil)
