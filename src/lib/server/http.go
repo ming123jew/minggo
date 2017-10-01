@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"strings"
-	"cms/controller"
 	"reflect"
-	"cms/controller/admin"
+
 )
 
 var stop chan bool = make(chan bool,1)
 
 type Http_Server struct {
-	Object  map[string]interface{}
+
+	Rooutes  map[string]interface{}
 	Methods map[string]string
 }
 
@@ -27,18 +26,22 @@ func init()  {
 
 //通过外反射传入
 func (self *Http_Server)SetObject(p map[string]interface{})  {
-	self.Object = p
+	self.Rooutes = p
 }
 
 //反射调用控制器里面的方法
 func (self *Http_Server) RunMethod(handler interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
+
+		//由于路由全部转发到/  进入r开始处理url
+		fmt.Println(r.URL)
+
 		//如果在方法字典存在 则获取value，此处是{"GET":"Get"}
 		params := []reflect.Value{reflect.ValueOf(w), reflect.ValueOf(r)}
-		method, ok := self.Methods["Test"]
-		//fmt.Println("runmethod",r.URL)
-		//fmt.Println("runmethod",self.Methods)
-		//fmt.Println("runmethod",ok)
+		method, ok := self.Methods[r.Method]
+		fmt.Println("run_url",r.URL)
+		fmt.Println("runmethod",r.Method)
+		fmt.Println("runmethod",ok)
 		if ok {
 			f := reflect.ValueOf(handler).MethodByName(method)
 			if f.IsValid() {
@@ -48,6 +51,14 @@ func (self *Http_Server) RunMethod(handler interface{}) http.HandlerFunc {
 	}
 }
 func (self *Http_Server)Run()  {
+	self.Methods = make(map[string]string)
+	len_methods := len(self.Methods)
+	if len_methods<=0{
+		self.Methods = map[string]string{
+			"GET" : "GET",
+			"POST" : "POST",
+		}
+	}
 	//服务器1
 	//192.168.14.253:8888
 	//目录 /css/  /images/
@@ -88,20 +99,10 @@ func (self *Http_Server)Run()  {
 		//发送关闭操作
 		//close(stop)
 	}
-	var cbc controller.BaseController = controller.BaseController{}
 
-	//var home2 home.HomeController = home.HomeController{}
-	route_strings := cbc.Init()
-	self.Methods = make(map[string]string)
-	self.Methods["Test"] = "Test"
-	for _,v:=range route_strings{
-		s := strings.Split(v,"=>")
-		fmt.Println(strings.TrimSpace(s[0]))
-	}
-
-	fmt.Println(self.Object)
-	http.HandleFunc("test", cbc.Test)
-	http.HandleFunc("/admin/test", self.RunMethod(&admin.AdminController{}))
+	fmt.Println(self.Rooutes)
+	//http.HandleFunc("/", cbc.Test)
+	http.HandleFunc("/", self.RunMethod(self.Rooutes["/admin/login"]))
 	http.ListenAndServe(":8000", nil)
 }
 

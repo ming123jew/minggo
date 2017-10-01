@@ -1,7 +1,6 @@
 package admin
 
-var Route []string = []string{
-	"/admin/ok         =>    admin.IndexController.OK",
-	"/admin/main       =>     IndexController.main",
-	"/admin/test         =>    admin.AdminController.Test",
+var Route  map[string]interface{} = map[string]interface{}{
+		"/admin/login":"&admin.AdminController{}",
+		"/home/index":"&home.HomeController{}",
 }

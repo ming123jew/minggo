@@ -11,7 +11,7 @@ type BaseController struct {
 	r *http.Request
 }
 
-func (bc *BaseController)Init() []string  {
+func (bc *BaseController)Init() map[string]interface{}  {
 
 	return admin.Route
 }
