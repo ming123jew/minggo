@@ -5,6 +5,7 @@ import(
 	"fmt"
 	"time"
 	"sync/atomic"
+	"reflect"
 )
 
 var Quit  = make(chan int)  // 只开一个信道
@@ -13,6 +14,13 @@ func foo(id int) {
 	fmt.Println(id)
 	Quit <- 0 // ok, finished
 }
+
+type T struct {
+
+}
+func (t *T) Foo() {}
+func (t *T) Bar() {}
+
 func main() {
 	//runtime.GOMAXPROCS(1)
 

@@ -7,6 +7,9 @@ import (
 	"strings"
 	"io/ioutil"
 	"fmt"
+	"os/exec"
+	"reflect"
+	"errors"
 )
 
 func Version() []string  {
@@ -28,7 +31,16 @@ func (mg *MingGo)GetContrller(dir string)  {
 	fmt.Println( WalkDir(dir,"","controller") )
 }
 
+func GetLibWd()  {
+	return
+}
 
+func GetCurrentPath() string {
+	s, _ := exec.LookPath(os.Args[0])
+	i := strings.LastIndex(s, "\\")
+	path := string(s[0 : i+1])
+	return path
+}
 func GetCurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -84,3 +96,20 @@ func WalkDir(dirPth, suffix string,needDir string) (files []string, err error) {
 	return files, err
 }
 
+//判断数组、MAP健值是否存在
+func Contains(obj interface{}, target interface{}) (bool, error) {
+	targetValue := reflect.ValueOf(target)
+	switch reflect.TypeOf(target).Kind() {
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < targetValue.Len(); i++ {
+			if targetValue.Index(i).Interface() == obj {
+				return true, nil
+			}
+		}
+	case reflect.Map:
+		if targetValue.MapIndex(reflect.ValueOf(obj)).IsValid() {
+			return true, nil
+		}
+	}
+	return false, errors.New("not in")
+}

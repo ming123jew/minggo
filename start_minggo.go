@@ -8,13 +8,9 @@ import (
 )
 
 
-//注册项目结构体
-//如需注册其它目录请按照相同格式
+//初始化
 func init()  {
-
 }
-
-
 
 //import "./src/server"
 func main()  {
@@ -31,8 +27,8 @@ func main()  {
 
 func initHttp()  {
 	http_server := server.Http_Server{}
-
 	http_server.SetObject(admin.Route)
+
 	//mut := reflect.ValueOf(http_server).Elem()
 	//mut.FieldByName("Object").SetMapIndex(reflect.ValueOf("admin"), reflect.ValueOf(admin.AdminController{}))
 	//params :=  []reflect.Value{reflect.ValueOf(regStruct)}
@@ -40,8 +36,5 @@ func initHttp()  {
 	//if f.IsValid() {
 	//	f.Call(params)
 	//}
-
 	http_server.Run()
-
-
 }

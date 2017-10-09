@@ -6,14 +6,13 @@ import (
 	"log"
 	"time"
 	"reflect"
-
 )
 
 var stop chan bool = make(chan bool,1)
 
 type Http_Server struct {
 
-	Rooutes  map[string]interface{}
+	Routes  map[string]interface{}
 	Methods map[string]string
 }
 
@@ -26,7 +25,7 @@ func init()  {
 
 //通过外反射传入
 func (self *Http_Server)SetObject(p map[string]interface{})  {
-	self.Rooutes = p
+	self.Routes = p
 }
 
 //反射调用控制器里面的方法
@@ -34,14 +33,10 @@ func (self *Http_Server) RunMethod(handler interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
 
 		//由于路由全部转发到/  进入r开始处理url
-		fmt.Println(r.URL)
 
 		//如果在方法字典存在 则获取value，此处是{"GET":"Get"}
 		params := []reflect.Value{reflect.ValueOf(w), reflect.ValueOf(r)}
 		method, ok := self.Methods[r.Method]
-		fmt.Println("run_url",r.URL)
-		fmt.Println("runmethod",r.Method)
-		fmt.Println("runmethod",ok)
 		if ok {
 			f := reflect.ValueOf(handler).MethodByName(method)
 			if f.IsValid() {
@@ -75,7 +70,11 @@ func (self *Http_Server)Run()  {
 	}
 	for _,v:=range ports{
 		mux := http.NewServeMux()
-		mux.HandleFunc("/", index)
+
+		for k,v:=range self.Routes{
+			mux.HandleFunc(k, self.RunMethod(v))
+			//http.HandleFunc(k, self.RunMethod(v))
+		}
 		server := &http.Server{
 			Addr: v,
 			ReadTimeout: 60 * time.Second,
@@ -100,10 +99,10 @@ func (self *Http_Server)Run()  {
 		//close(stop)
 	}
 
-	fmt.Println(self.Rooutes)
+	fmt.Println(self.Routes)
 	//http.HandleFunc("/", cbc.Test)
-	http.HandleFunc("/", self.RunMethod(self.Rooutes["/admin/login"]))
-	http.ListenAndServe(":8000", nil)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.ListenAndServe(":8001", nil)
 }
 
 func (h Http_Server)Stop()  {
