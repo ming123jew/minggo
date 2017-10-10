@@ -13,7 +13,7 @@ Purchase: http://wrapbootstrap.com
     <meta name="description" content="login page" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <base href="http://192.168.14.253:8001/static/admin/"/>
+    <base href="{{.__STATIC__}}"/>
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
     <!--Basic Styles-->
@@ -84,7 +84,9 @@ Purchase: http://wrapbootstrap.com
             SDCMS多网站管理系统v1.0.0
         </div>
     </div>
-
+    <div style="text-align: center">
+        power by {{.__POWER_BY__}}
+    </div>
     <!--Basic Scripts-->
     <script src="assets/js/jquery-2.0.3.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>

@@ -5,15 +5,16 @@ import (
 	"fmt"
 	//"lib/mustache"
 )
+
+//模板数据
 var TemplateData  = make(map[string]interface{})
+
 //登录
 type Login struct {
 	username string
 	passwrod string
 	is_login bool
 }
-
-
 
 func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 	session, _ := Session.Get(r,"test")
@@ -22,6 +23,11 @@ func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 	session.Values[42] = 43
 	// Save it before we write to the response/return from the handler.
 	session.Save(r, w)
+
+	sql := "select * from gosys_user"
+	results, err := Orm.Query(sql)
+	fmt.Println(results,err)
+
 
 	//fmt.Println(session.Options)
 	/*
