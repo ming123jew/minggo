@@ -29,6 +29,7 @@ func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 	fmt.Println(results,err)
 
 
+
 	//fmt.Println(session.Options)
 	/*
 	t,error:=template.ParseFiles("./src/cms/views/admin/login.html")//New("login.html")
@@ -50,6 +51,5 @@ func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 
 func  (own *Login)POST(w http.ResponseWriter, r *http.Request)  {
 	fmt.Fprintf(w, "admin_post_login")
-
 }
 
