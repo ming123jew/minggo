@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"lib/sesson"
 	"lib/core"
+	"cms/initialize"
+	"cms/model"
 )
 var (
 	SessionStore = sessions.NewCookieStore([]byte("minggo"))

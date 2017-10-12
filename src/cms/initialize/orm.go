@@ -1,4 +1,4 @@
-package admin
+package initialize
 
 import (
 	_ "lib/xorm/drivers/mysql"
@@ -16,7 +16,7 @@ func init()  {
 	password := "123456"
 	server :="127.0.0.1"
 	port := "3306"
-	db_name := "chat"
+	db_name := "minggo"
 	charset := "utf8"
 	Orm = NewOrm(server , username , password , db_name , charset , port )
 }
@@ -31,7 +31,7 @@ func NewOrm(server string, username string, password string, db_name string, cha
 		fmt.Println("mysql:error:",err)
 	}
 	orm.TZLocation = time.Local
-	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, "gosys_")
+	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, "m_")
 	orm.SetTableMapper(tbMapper)
 	return orm
 }

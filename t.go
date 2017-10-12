@@ -70,6 +70,8 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var user UserCredentials
 	err := json.NewDecoder(r.Body).Decode(&user)
+	fmt.Println(r.Body)
+	fmt.Println(json.NewDecoder(r.Body).Decode(&user))
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Fprint(w, "Error in request",err)

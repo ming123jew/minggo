@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"fmt"
 	//"lib/mustache"
+
+	"cms/initialize"
 )
 
 //模板数据
@@ -11,8 +13,8 @@ var TemplateData  = make(map[string]interface{})
 
 //登录
 type Login struct {
-	username string
-	passwrod string
+	username string `json:"username"`
+	passwrod string `json:"password"`
 	is_login bool
 }
 
@@ -25,7 +27,8 @@ func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 	session.Save(r, w)
 
 	sql := "select * from gosys_user"
-	results, err := Orm.Query(sql)
+
+	results, err := initialize.Orm.Query(sql)
 	fmt.Println(results,err)
 
 
@@ -50,6 +53,8 @@ func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
 }
 
 func  (own *Login)POST(w http.ResponseWriter, r *http.Request)  {
+
+
 	fmt.Fprintf(w, "admin_post_login")
 }
 
