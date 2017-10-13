@@ -32,10 +32,10 @@ func main()  {
 
 }
 
+//启动http服务
 func initHttp()  {
 	http_server := server.Http_Server{}
 	http_server.SetObject(admin.Route)
-
 	//mut := reflect.ValueOf(http_server).Elem()
 	//mut.FieldByName("Object").SetMapIndex(reflect.ValueOf("admin"), reflect.ValueOf(admin.AdminController{}))
 	//params :=  []reflect.Value{reflect.ValueOf(regStruct)}
@@ -46,6 +46,7 @@ func initHttp()  {
 	http_server.Run()
 }
 
+//加载model
 func initModel()  {
 	//同步数据库表
 	err := initialize.Orm.Sync2(new(model.AdminUser),new(model.Group) )

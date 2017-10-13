@@ -7,7 +7,7 @@ type AdminUser struct {
 	Username 	string		`xorm:"char(30) notnull"`
 	Password 	string		`xorm:"varchar(40) notnull"`
 	Roleid   	int			`xorm:"int(10) notnull"`
-	Regtime     int			`xorm:"int(10) notnull"`
+	Regtime     int			`xorm:"int(10) notnull created"`
 	Email    string 		`xorm:"varchar(60) notnull"`
 	Status   int    		`xorm:"bool notnull"`
 }
@@ -19,10 +19,11 @@ type Group struct {
 }
 
 
-func (self *AdminUser)GetByUsernameAndPassword(username int,password string) (*AdminUser,error) {
-	u := &AdminUser{Id:username,Password:password}
-	_,err := initialize.Orm.Get(u)
-	return u,err
+func (self *AdminUser)GetByUsernameAndPassword(username string,password string) (bool,*AdminUser,error) {
+	u := &AdminUser{Username:username,Password:password}
+	r,err := initialize.Orm.Get(u)
+	return r,u,err
+
 }
 
 func (self *AdminUser)IsExist()  {

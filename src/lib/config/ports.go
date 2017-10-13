@@ -1,9 +1,19 @@
 package config
 
-var port_1 map[string]string=map[string]string{
-	"Addr":"192.168.12.253:8888",
-	"ReadTimeout":"60",
-	"WriteTimeout":"60",
-	"RouteHandleFunc":"",
+import "time"
+
+var HTTP_SERVERS []map[string]interface{}= []map[string]interface{}{
+
+	{	"Addr":":8888",
+		"ReadTimeout":60 * time.Second,
+		"WriteTimeout": 60 * time.Second,
+		"Static":nil,
+	},
+
+	{	"Addr":":8889",
+		"ReadTimeout":60 * time.Second,
+		"WriteTimeout": 60 * time.Second,
+		"Static":"/static/",
+	},
 }
 

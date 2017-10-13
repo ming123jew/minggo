@@ -6,45 +6,55 @@ import (
 	"log"
 	"time"
 	"reflect"
+	"lib/config"
+	"net/url"
 )
-
 var stop chan bool = make(chan bool,1)
 
 type Http_Server struct {
-
-	Routes  map[string]interface{}
+	Routes  map[string]map[string]interface{}
 	Methods map[string]string
 }
 
 type help_handle func(w http.ResponseWriter, r *http.Request)
 
 func init()  {
-
-
 }
 
-//通过外反射传入
-func (self *Http_Server)SetObject(p map[string]interface{})  {
+//传入
+func (self *Http_Server)SetObject(p map[string]map[string]interface{})  {
 	self.Routes = p
 }
 
 //反射调用控制器里面的方法
-func (self *Http_Server) RunMethod(handler interface{}) http.HandlerFunc {
+func (self *Http_Server) RunMethod(handler map[string]interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request){
-
-		//由于路由全部转发到/  进入r开始处理url
-
+		fmt.Println(handler)
 		//如果在方法字典存在 则获取value，此处是{"GET":"Get"}
 		params := []reflect.Value{reflect.ValueOf(w), reflect.ValueOf(r)}
-		method, ok := self.Methods[r.Method]
+		//通过m来改变，尝试获取地址参数m,如m不为空，反射到此方法
+		queryForm, err := url.ParseQuery(r.URL.RawQuery)
+		if err != nil {
+			fmt.Fprintf(w,err.Error())
+		}
+		var method  string
+		var ok bool
+		//fmt.Println(queryForm)
+		if  len(queryForm["m"]) >0{
+			method  = queryForm["m"][0]
+			ok =true
+		}else{
+			method, ok  = self.Methods[r.Method]
+		}
 		if ok {
-			f := reflect.ValueOf(handler).MethodByName(method)
+			f := reflect.ValueOf(handler["struct"]).MethodByName(method)
 			if f.IsValid() {
 				f.Call(params)
 			}
 		}
 	}
 }
+
 func (self *Http_Server)Run()  {
 	self.Methods = make(map[string]string)
 	len_methods := len(self.Methods)
@@ -54,31 +64,23 @@ func (self *Http_Server)Run()  {
 			"POST" : "POST",
 		}
 	}
-	//服务器1
-	//192.168.14.253:8888
-	//目录 /css/  /images/
-	//服务器2
-	//192.168.14.253:8889
-	//目录 /css2/  /images2/
-
-	//http.HandleFunc("/admin/", adminHandler)
-	//http.HandleFunc("/login/",loginHandler)
-	//http.HandleFunc("/ajax/",ajaxHandler)
-	ports := []string{
-		":8888",
-		":8889",
-	}
-	for _,v:=range ports{
+	//http服务器配置
+	//fmt.Println(config.HTTP_SERVERS)
+	for _,v:=range config.HTTP_SERVERS{
 		mux := http.NewServeMux()
-
+		//路由映射
 		for k,v:=range self.Routes{
 			mux.HandleFunc(k, self.RunMethod(v))
 			//http.HandleFunc(k, self.RunMethod(v))
 		}
+		//如需作为文件服务器 config.HTTP_SERVERS 对应的Static 不为nil
+		if v["Static"]!=nil{
+			mux.Handle(v["Static"].(string), http.StripPrefix(v["Static"].(string), http.FileServer(http.Dir("."+v["Static"].(string)))))
+		}
 		server := &http.Server{
-			Addr: v,
-			ReadTimeout: 60 * time.Second,
-			WriteTimeout: 60 * time.Second,
+			Addr:v["Addr"].(string) ,
+			ReadTimeout: v["ReadTimeout"].(time.Duration),
+			WriteTimeout:  v["WriteTimeout"].(time.Duration),
 			Handler: mux,
 		}
 
