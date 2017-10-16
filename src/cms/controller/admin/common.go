@@ -8,8 +8,6 @@ import (
 //jwt key
 const JwtSecretKey  = "ming123jew!@#$%^&*()"
 
-//模板数据
-var TemplateData  = make(map[string]interface{})
 
 type JwtToken struct {
 	Token string `json:"token"`

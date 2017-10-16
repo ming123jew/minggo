@@ -7,7 +7,7 @@ package xorm
 import (
 	"sync"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 var _ core.CacheStore = NewMemoryStore()

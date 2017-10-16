@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"time"
 
-	"lib/xorm/builder"
-	"lib/xorm/core"
+	"lib/o-xorm/builder"
+	"lib/o-xorm/core"
 )
 
 func (engine *Engine) buildConds(table *core.Table, bean interface{},

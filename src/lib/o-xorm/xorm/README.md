@@ -26,7 +26,7 @@ Xorm is a simple and powerful ORM for Go.
 
 * Optimistic Locking support
 
-* SQL Builder support via [lib/xorm/builder](https://lib/xorm/builder)
+* SQL Builder support via [lib/o-xorm/builder](https://lib/o-xorm/builder)
 
 # Drivers Support
 
@@ -63,7 +63,7 @@ Drivers for Go's sql package which currently support database/sql includes:
 
 * **v0.6.0**
     * remove support for ql
-    * add query condition builder support via [lib/xorm/builder](https://lib/xorm/builder), so `Where`, `And`, `Or` 
+    * add query condition builder support via [lib/o-xorm/builder](https://lib/o-xorm/builder), so `Where`, `And`, `Or` 
 methods can use `builder.Cond` as parameter
     * add Sum, SumInt, SumInt64 and NotIn methods
     * some bugs fixed

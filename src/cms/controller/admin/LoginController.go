@@ -7,62 +7,74 @@ import (
 	//"cms/initialize"
 	"encoding/json"
 	"cms/model"
-	"lib/jwt-go"
+	"lib/o-jwt-go"
 	"time"
-	"net/url"
+	"sync"
 )
 
 //登录验证
 type Login struct {
+	mutex sync.RWMutex
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+func (own *Login)ServeHTTP(w http.ResponseWriter, r *http.Request)  {}
 
 //登录页面显示
 func  (own *Login)GET(w http.ResponseWriter, r *http.Request)  {
-	queryForm, err := url.ParseQuery(r.URL.RawQuery)
-	if err != nil {
-		fmt.Fprintf(w,err.Error())
+	//own.mutex.Lock()
+	//defer own.mutex.Unlock()
+	//登录页
+	//testing
+	//session, _ := Session.Get(r,"test")
+	// Set some session values.
+	//session.Values["foo"] = "bar"
+	//session.Values[42] = 43
+	// Save it before we write to the response/return from the handler.
+	//session.Save(r, w)
+	//sql := "select * from m_admin_user"
+	//results, err := initialize.Orm.Query(sql)
+	//fmt.Println(results,err)
+	//fmt.Println(session.Options)
+	/*
+	t,error:=template.ParseFiles("./src/cms/views/admin/login.html")//New("login.html")
+	if error!=nil{
+		fmt.Fprintf(w,error.Error())
+		return
 	}
-	//预留参数a  以便选择哪个方法
-	if len(queryForm["a"])>0{
-		switch  queryForm["a"][0] {
-		//主页
-		case "main":
-			own.Main(w,r)
-		}
-	}else{
-		//登录页
-		//testing
-		//session, _ := Session.Get(r,"test")
-		// Set some session values.
-		//session.Values["foo"] = "bar"
-		//session.Values[42] = 43
-		// Save it before we write to the response/return from the handler.
-		//session.Save(r, w)
-		//sql := "select * from m_admin_user"
-		//results, err := initialize.Orm.Query(sql)
-		//fmt.Println(results,err)
-		//fmt.Println(session.Options)
-		/*
-		t,error:=template.ParseFiles("./src/cms/views/admin/login.html")//New("login.html")
-		if error!=nil{
-			fmt.Fprintf(w,error.Error())
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		error = t.Execute(w, TemplateData)
-		if error != nil{
-			fmt.Fprintf(w,error.Error())
-			return
-		}*/
-		TemplateData["title"] ="OK"
-		Template.Html(w,r,"login",TemplateData)
-		//s := mustache.RenderFileInLayout("./src/cms/views/admin/login.html", "./src/cms/views/admin/layout.html.mustache", nil)
-		//fmt.Fprintf(w,s)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	error = t.Execute(w, TemplateData)
+	if error != nil{
+		fmt.Fprintf(w,error.Error())
+		return
+	}*/
+	//TemplateData["title"] ="OK"
+	type Users struct {
+		Username string
+	}
+	users := []Users{
+		{Username:"ming123jew"},
+		{Username:"ming"},
+	}
+	type Mo struct {
+		Ua string
+	}
+	mo := []Mo{
+		{"mmm"},
 	}
 
-
+	Template.SetTemplateData(
+		struct {
+		Users []Users
+		Mo []Mo
+		}{
+		users,
+		mo,
+		},
+	)
+	Template.Html(w,r,"login",Template.TemplateData)
+	//s := mustache.RenderFileInLayout("./src/cms/views/admin/login.html", "./src/cms/views/admin/layout.html.mustache", nil)
+	//fmt.Fprintf(w,s)
 }
 
 //登录操作 | jwt

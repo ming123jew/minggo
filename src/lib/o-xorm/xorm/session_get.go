@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // Get retrieve one record from database, bean's non-empty fields

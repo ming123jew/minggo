@@ -9,7 +9,7 @@ import (
 	"io"
 	"log"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // default log options

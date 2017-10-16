@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 const (

@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"lib/xorm/builder"
-	"lib/xorm/core"
+	"lib/o-xorm/builder"
+	"lib/o-xorm/core"
 )
 
 // Engine is the major struct of xorm, it means a database manager.

@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"reflect"
 	"errors"
+	"net/http"
 )
 
 func Version() []string  {
@@ -19,7 +20,9 @@ func Version() []string  {
 
 type MingGo struct {
 
+
 }
+
 
 func (mg *MingGo)Config(args ...string)  {
 	currentDir := GetCurrentDirectory()

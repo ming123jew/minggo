@@ -1,10 +1,10 @@
 package initialize
 
 import (
-	_ "lib/xorm/drivers/mysql"
-	"lib/xorm/xorm"
+	_ "lib/o-xorm/drivers/mysql"
+	"lib/o-xorm/xorm"
 	"time"
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 	"fmt"
 	"lib/config"
 )

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"lib/xorm/builder"
+	"lib/o-xorm/builder"
 	"github.com/stretchr/testify/assert"
 )
 

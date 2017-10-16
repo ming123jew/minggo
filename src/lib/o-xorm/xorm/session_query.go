@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // Query runs a raw sql and return records as []map[string][]byte

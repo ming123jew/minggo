@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 var (

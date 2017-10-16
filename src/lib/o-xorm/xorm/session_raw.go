@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"time"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 func (session *Session) queryPreprocess(sqlStr *string, paramStr ...interface{}) {

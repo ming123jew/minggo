@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // str2PK convert string value to primary key value according to tp

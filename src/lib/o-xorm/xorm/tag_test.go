@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 	"github.com/stretchr/testify/assert"
 )
 

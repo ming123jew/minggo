@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // Insert insert one or more beans

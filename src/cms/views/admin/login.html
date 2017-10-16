@@ -13,7 +13,7 @@ Purchase: http://wrapbootstrap.com
     <meta name="description" content="login page" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <base href="{{.__STATIC__}}"/>
+    <base href=" {{.SYSDATA.STATIC}}"/>
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
     <!--Basic Styles-->
@@ -43,6 +43,13 @@ Purchase: http://wrapbootstrap.com
 <!--Head Ends-->
 <!--Body-->
 <body>
+
+{{range $i, $v := .PAGEDATA.Users}}
+{{$v.Username}}
+{{end}}
+{{range $i, $v := .PAGEDATA.Mo}}
+{{$v.Ua}}
+{{end}}
     <div class="login-container animated fadeInDown">
         <div class="loginbox bg-white">
             <div class="loginbox-title">SIGN IN</div>

@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"strings"
 
-	"lib/xorm/builder"
-	"lib/xorm/core"
+	"lib/o-xorm/builder"
+	"lib/o-xorm/core"
 )
 
 const (

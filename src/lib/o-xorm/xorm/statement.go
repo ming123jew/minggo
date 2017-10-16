@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"lib/xorm/builder"
-	"lib/xorm/core"
+	"lib/o-xorm/builder"
+	"lib/o-xorm/core"
 )
 
 type incrParam struct {

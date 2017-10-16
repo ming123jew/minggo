@@ -68,7 +68,7 @@ xorm是一个简单而强大的Go语言ORM库. 通过它可以使数据库操作
 
 * **v0.6.0**
     * 去除对 ql 的支持
-    * 新增条件查询分析器 [lib/xorm/builder](https://lib/xorm/builder), 从因此 `Where, And, Or` 函数
+    * 新增条件查询分析器 [lib/o-xorm/builder](https://lib/o-xorm/builder), 从因此 `Where, And, Or` 函数
 将可以用 `builder.Cond` 作为条件组合
     * 新增 Sum, SumInt, SumInt64 和 NotIn 函数
     * Bug修正

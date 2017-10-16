@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 var colStrTests = []struct {

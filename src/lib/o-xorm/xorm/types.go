@@ -3,7 +3,7 @@ package xorm
 import (
 	"reflect"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 var (

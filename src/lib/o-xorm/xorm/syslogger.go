@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log/syslog"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 var _ core.ILogger = &SyslogLogger{}

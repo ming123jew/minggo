@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"strings"
 
-	"lib/xorm/core"
+	"lib/o-xorm/core"
 )
 
 // Ping test if database is ok
