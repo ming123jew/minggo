@@ -27,6 +27,7 @@ type TemplateData struct {
 type SYSDATA struct {
 	STATIC string
 	POWER_BY string
+	POSTURL string
 }
 
 func NewTemplate(arg ...string) *MingGoTemplate  {

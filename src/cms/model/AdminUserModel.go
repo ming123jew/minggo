@@ -1,6 +1,8 @@
 package model
 
-import "cms/initialize"
+import (
+	"cms/initialize"
+)
 
 type AdminUser struct {
 	Id 			int			`xorm:"int(11) pk autoincr"`
@@ -21,9 +23,10 @@ type Group struct {
 
 func (self *AdminUser)GetByUsernameAndPassword(username string,password string) (bool,*AdminUser,error) {
 	u := &AdminUser{Username:username,Password:password}
+	//log.Println(u)
 	r,err := initialize.Orm.Get(u)
+	u.Password=""
 	return r,u,err
-
 }
 
 func (self *AdminUser)IsExist()  {

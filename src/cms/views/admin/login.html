@@ -92,14 +92,20 @@ Purchase: http://wrapbootstrap.com
         </div>
     </div>
     <div style="text-align: center">
-        power by {{.__POWER_BY__}}
+        power by {{.SYSDATA.POWER_BY}}
     </div>
     <!--Basic Scripts-->
     <script src="assets/js/jquery-2.0.3.min.js"></script>
+    <script src="assets/js/jquery.cookie.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
 
+
     <script>
+        var BaseUrl = "{{.SYSDATA.POSTURL}}"
         $(function(){
+            var LoginTokenStorage =null
+            var Headers =null
+            var sendData=null
 
             $('.btn-primary').bind('click',function () {
                var username = $('#username');
@@ -122,11 +128,46 @@ Purchase: http://wrapbootstrap.com
                    },4000)
                    return false;
                }
-
-               $.post('http://192.168.12.3:8081/Admin/Main/login?v=3&p=3',{username:username.val(),password:password.val()},function (json) {
-                    console.log(json)
-               })
-
+                sendData={username:username.val(),password:password.val()}
+                Headers = null;
+                if (JSON.stringify(sendData)!=null){
+                    $.ajax({
+                        contentType: 'application/x-www-form-urlencoded',
+                        headers: Headers,
+                        url: BaseUrl+"admin/login?m=Jwt",
+                        async: true,
+                        type: 'post',
+                        data: JSON.stringify(sendData),
+                        beforeSend: function(xhr) {
+                            LoginTokenStorage = sessionStorage.getItem("LoginTokenStorage");
+                            if (LoginTokenStorage!=null){
+                                xhr.setRequestHeader("Content-Type","application/json")
+                                xhr.setRequestHeader("Authorization", LoginTokenStorage);
+                            }
+                        },
+                        success: function(e) {
+                            e = eval("("+e+")")
+                            if (e.state){
+                                try {
+                                    sessionStorage.setItem("LoginTokenStorage", e.token);
+                                    console.log("LoginTokenStorage write success.")
+                                }catch (err){
+                                    $.cookie('LoginTokenStorage', e, { expires: 1, path: '/' });
+                                }
+                            }else{
+                                try {
+                                    sessionStorage.setItem("LoginTokenStorage", null);
+                                }catch (err){
+                                    $.cookie('LoginTokenStorage', null, { expires: 1, path: '/' });
+                                }
+                                logobox.html(e.message)
+                            }
+                        },
+                        error: function(e) {
+                            logobox.html(e)
+                        }
+                    });
+                }
             })
         })
     </script>

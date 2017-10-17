@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dgrijalva/jwt-go"
+	"lib/o-jwt-go"
 )
 
 var ecdsaTestData = []struct {

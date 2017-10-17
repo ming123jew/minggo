@@ -1,9 +1,8 @@
 package admin
 
 import (
-	"fmt"
 	"net/http"
-	"log"
+	"fmt"
 )
 
 
@@ -27,7 +26,7 @@ type RbacI interface {
 func RbacFunc(next http.Handler) http.Handler{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//log.Println("run rbac")
-		log.Println(r.URL)
+		//log.Println(r.URL)
 		next.ServeHTTP(w, r)
 		//log.Println("end rbac")
 

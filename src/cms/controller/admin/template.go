@@ -9,9 +9,11 @@ import (
 var Template = template.NewTemplate()
 
 func init()  {
+
 	ds := template.SYSDATA{
 		"http://192.168.14.253:8001/static/admin/",
 		"minggo  2017",
+		"http://192.168.14.253:8888/",
 	}
 
 	//Map_DefalutStatic := cmap.New()

@@ -23,11 +23,11 @@ This library supports the parsing and verification as well as the generation and
 
 ## Examples
 
-See [the project documentation](https://godoc.org/github.com/dgrijalva/jwt-go) for examples of usage:
+See [the project documentation](https://godoc.org/lib/o-jwt-go) for examples of usage:
 
-* [Simple example of parsing and validating a token](https://godoc.org/github.com/dgrijalva/jwt-go#example-Parse--Hmac)
-* [Simple example of building and signing a token](https://godoc.org/github.com/dgrijalva/jwt-go#example-New--Hmac)
-* [Directory of Examples](https://godoc.org/github.com/dgrijalva/jwt-go#pkg-examples)
+* [Simple example of parsing and validating a token](https://godoc.org/lib/o-jwt-go#example-Parse--Hmac)
+* [Simple example of building and signing a token](https://godoc.org/lib/o-jwt-go#example-New--Hmac)
+* [Directory of Examples](https://godoc.org/lib/o-jwt-go#pkg-examples)
 
 ## Extensions
 
@@ -45,7 +45,7 @@ This library was last reviewed to comply with [RTF 7519](http://www.rfc-editor.o
 
 This library is considered production ready.  Feedback and feature requests are appreciated.  The API should be considered stable.  There should be very few backwards-incompatible changes outside of major version updates (and only with good reason).
 
-This project uses [Semantic Versioning 2.0.0](http://semver.org).  Accepted pull requests will land on `master`.  Periodically, versions will be tagged from `master`.  You can find all the releases on [the project releases page](https://github.com/dgrijalva/jwt-go/releases).
+This project uses [Semantic Versioning 2.0.0](http://semver.org).  Accepted pull requests will land on `master`.  Periodically, versions will be tagged from `master`.  You can find all the releases on [the project releases page](https://lib/o-jwt-go/releases).
 
 While we try to make it obvious when we make breaking changes, there isn't a great mechanism for pushing announcements out to users.  You may want to use this alternative package include: `gopkg.in/dgrijalva/jwt-go.v2`.  It will do the right thing WRT semantic versioning.
 
@@ -80,6 +80,6 @@ Without going too far down the rabbit hole, here's a description of the interact
  
 ## More
 
-Documentation can be found [on godoc.org](http://godoc.org/github.com/dgrijalva/jwt-go).
+Documentation can be found [on godoc.org](http://godoc.org/lib/o-jwt-go).
 
 The command line utility included in this project (cmd/jwt) provides a straightforward example of token creation and parsing as well as a useful tool for debugging your own integration. You'll also find several implementation examples in the documentation.
