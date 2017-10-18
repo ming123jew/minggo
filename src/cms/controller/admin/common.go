@@ -6,14 +6,31 @@ import (
 	"lib/o-jwt-go"
 	"lib/o-jwt-go/request"
 	"fmt"
-	"log"
 	"cms/model"
+	"log"
 )
 
 //jwt key
 const (
-	JwtSecretKey  = "ming123jew!@#$%^&*()"
-	AdminLoginFlag  = "admin_login_info"
+	ConstJwtSecretKey  = "ming123jew!@#$%^&*()"
+	ConstSessionAdminLoginFlag  = "admin_login_info"
+	ConstSessionAdminLoginFlagValues  = "userinfo"
+
+	ConstSessionOptionsMaxAge =  86400 * 1 //1天
+	ConstSessionOptionsPath =  "/"
+	ConstSessionOptionsHttpOnly = true
+
+	ConstTemplateSysdataPowerBy = "MingGo  2017"
+
+	ConstTemplateOptionsDirectory = "./src/cms/views/admin/"  //模板对应目录
+	ConstTemplateOptionsCharset = "UTF-8" //页面编码
+	ConstTemplateOptionsHTMLContentType = "text/html"
+	ConstTemplateOptionsExtension = ".html" //模板扩展名
+)
+var(
+	ConstHttpHost = "http://192.168.14.253:8888/"
+	ConstTemplateSysdataStatic = "http://192.168.14.253:8001/static/admin/"
+	ConstTemplateSysdataPostUrl = ConstHttpHost
 )
 
 type JwtToken struct {
@@ -26,33 +43,50 @@ type JwtToken struct {
 var AuthorizationSession = &SessionIsLoginer{}
 //基于jwt-access_token认证对象
 var AuthorizationJwt = &JwtIsLoginer{}
-
 var LoginUserInfo = &model.AdminUser{}
 
+//是否登录接口
 type IsLoginer interface {
 	IsLogin(*http.Handler)http.Handler
 }
+//session方式
 type SessionIsLoginer []string
 //根据session进行验证
-func (own SessionIsLoginer)IsLogin(next http.Handler) http.Handler {
+func (own SessionIsLoginer)IsLogin(next http.HandlerFunc,gourl ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("SessionIsLoginer")
+		session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
+		userinfo_json := session.Values[ConstSessionAdminLoginFlagValues]
+		log.Println(session)
+		if userinfo_json!= nil{
+			json.Unmarshal(userinfo_json.([]byte),&LoginUserInfo)//json 传到 struct
+			log.Println(LoginUserInfo)
+			next(w,r)
+		}else{
+			if gourl[0]!=""{
+				fmt.Fprintf(w,"Unauthorized access to this resource. Please login system.\n")
+				http.Redirect(w,r,gourl[0],200)
+			}else{
+				w.WriteHeader(http.StatusUnauthorized)
+				fmt.Fprint(w, "Unauthorized access to this resource. \nError: login failed.")
+			}
+
+		}
 	})
 }
-
+//jwt方式
 type JwtIsLoginer []string
 //根据地址参数进行验证access_token
-func (own JwtIsLoginer)IsLogin(next http.Handler) http.Handler {
+func (own JwtIsLoginer)IsLogin(next http.HandlerFunc) http.HandlerFunc {
 	var token *jwt.Token
 	var err error
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, err = request.ParseFromRequest(r, request.ArgumentExtractor{"access_token"}, func(token *jwt.Token) (interface{}, error) {return []byte(JwtSecretKey), nil})
+		token, err = request.ParseFromRequest(r, request.ArgumentExtractor{"access_token"}, func(token *jwt.Token) (interface{}, error) {return []byte(ConstJwtSecretKey), nil})
 		if err == nil {
 			if token.Valid {
 				//fmt.Fprint(w, "Token is true.")
-				j,_ := json.Marshal(token.Claims.(jwt.MapClaims)[AdminLoginFlag]) //map 转 json
+				j,_ := json.Marshal(token.Claims.(jwt.MapClaims)[ConstSessionAdminLoginFlag]) //map 转 json
 				json.Unmarshal(j,&LoginUserInfo)//json 传到 struct
-				next.ServeHTTP(w, r)
+				next(w, r)
 			} else {
 				w.WriteHeader(http.StatusUnauthorized)
 				fmt.Fprint(w, "Token is not valid.\nError:",err)
@@ -64,6 +98,7 @@ func (own JwtIsLoginer)IsLogin(next http.Handler) http.Handler {
 	})
 }
 
+//返回JSON
 func ReturnJsonResponse(response interface{}, w http.ResponseWriter) {
 	json, err := json.Marshal(response)
 	if err != nil {

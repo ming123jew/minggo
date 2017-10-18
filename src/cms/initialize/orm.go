@@ -6,7 +6,7 @@ import (
 	"time"
 	"lib/o-xorm/core"
 	"fmt"
-	"lib/config"
+	"cms/config"
 )
 
 var Orm  *xorm.Engine

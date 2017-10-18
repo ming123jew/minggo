@@ -35,7 +35,7 @@ func main()  {
 //启动http服务
 func initHttp()  {
 	http_server := server.Http_Server{}
-	http_server.SetObject(admin.Route)
+	http_server.SetRoutes(admin.Route)
 	//mut := reflect.ValueOf(http_server).Elem()
 	//mut.FieldByName("Object").SetMapIndex(reflect.ValueOf("admin"), reflect.ValueOf(admin.AdminController{}))
 	//params :=  []reflect.Value{reflect.ValueOf(regStruct)}

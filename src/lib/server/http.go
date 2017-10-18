@@ -39,18 +39,18 @@ func NewHttpServer()*Http_Server {
 	return new(Http_Server)
 }
 
-func HttpFunc(next http.Handler,i interface{}) http.Handler{
+func HttpFunc(next http.HandlerFunc,i interface{}) http.HandlerFunc{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//log.Println("before hook1")
 		a:=NewHttpServer()
 		a.DealHttpMethod(i,w,r)
-		next.ServeHTTP(w, r)
+		next(w, r)
 		//log.Println("after hook1")
 	})
 }
 
 //传入
-func (self *Http_Server)SetObject(p map[string]interface{})  {
+func (self *Http_Server)SetRoutes(p map[string]interface{})  {
 	self.Routes = p
 }
 
@@ -141,9 +141,22 @@ func (self *Http_Server)Run()  {
 
 	fmt.Println(self.Routes)
 	//http.HandleFunc("/", cbc.Test)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.Header{}.Set("Access-Control-Allow-Origin","*")
+	http.Handle("/static/", SetStaticHeader(http.StripPrefix("/static/", http.FileServer(http.Dir("./static")))))
 	http.ListenAndServe(":8001", nil)
 }
+
+
+func SetStaticHeader(next http.Handler) http.HandlerFunc{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//log.Println("befer.")
+		w.Header().Set("Access-Control-Allow-Origin", "*")             //允许访问所有域
+		w.Header().Add("Access-Control-Allow-Headers", "Content-Type") //header的类型
+		next.ServeHTTP(w,r)
+		//log.Println("afrer.")
+	})
+}
+
 
 func (h Http_Server)Stop()  {
 	stop<-true

@@ -14,10 +14,8 @@ Purchase: http://wrapbootstrap.com
     <meta name="description" content="Dashboard" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Authorization" content="test" />
+    <base href=" {{.SYSDATA.STATIC}}"/>
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
-    <base href="<?php echo ($data['HTML_URL']);?>"/>
     <!--Basic Styles-->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
     <link id="bootstrap-rtl-link" href="" rel="stylesheet" />
@@ -347,7 +345,7 @@ Purchase: http://wrapbootstrap.com
                                 </li>
                                 <!--/Theme Selector Area-->
                                 <li class="dropdown-footer">
-                                    <a href="<?php \app\Extend\Helpers\Helper::url($data['__C__'],'logout',['time'=>time()]);?>">
+                                    <a data="" href="{{.PAGEDATA.Host}}admin/login?m=Out&t={{.PAGEDATA.Time}}">
                                         Sign out
                                     </a>
                                 </li>
@@ -402,7 +400,8 @@ Purchase: http://wrapbootstrap.com
             </div>
             <!-- /Page Sidebar Header -->
             <!-- Sidebar Menu -->
-            <?php $this->insert('app::Admin/public_menu',['data'=>$data]) ?>
+
+            {{template "public_menu" .}}
             <!-- /Sidebar Menu -->
         </div>
         <!-- /Page Sidebar -->

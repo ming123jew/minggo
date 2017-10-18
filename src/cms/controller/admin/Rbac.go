@@ -5,9 +5,11 @@ import (
 	"fmt"
 )
 
+var Rbac = &RbacPermission{}
 
 type RbacPermission struct {
 	Permission  map[string][]string // article : article/get  article/post  article?m=add
+	UserPermission *UserPermission
 }
 type UserPermission struct {
 	Username 	string
@@ -15,25 +17,19 @@ type UserPermission struct {
 	Permission  map[string][]string // article : article/get  article/post  article?m=add
 }
 
-type Rbac struct {
-	UserPermission *UserPermission
-}
 type RbacI interface {
 	CheckPermission()
 	SetPermission()
 }
 
-func RbacFunc(next http.Handler) http.Handler{
+func RbacFunc(next http.HandlerFunc) http.HandlerFunc{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//log.Println("run rbac")
 		//log.Println(r.URL)
-		next.ServeHTTP(w, r)
+		next(w, r)
 		//log.Println("end rbac")
 
 	})
-}
-func NewRbac(rbac *Rbac) {
-	rbac.UserPermission.CheckPermission()
 }
 
 func (self *UserPermission)CheckPermission()  {
@@ -41,7 +37,7 @@ func (self *UserPermission)CheckPermission()  {
 }
 
 
-func (own *Rbac)test() {
+func (own *RbacPermission)test() {
 	fmt.Println("test rbaac")
 }
 

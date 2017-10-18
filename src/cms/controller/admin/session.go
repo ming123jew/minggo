@@ -6,8 +6,8 @@ var Session = sessions.NewCookieStore([]byte("minggo-admin"))
 func init()  {
 	//设置session默认参数
 	Session.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 1,//1天
-		HttpOnly: true,
+		Path:     ConstSessionOptionsPath,
+		MaxAge:   ConstSessionOptionsMaxAge,//1天
+		HttpOnly: ConstSessionOptionsHttpOnly,
 	}
 }

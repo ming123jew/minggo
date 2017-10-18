@@ -11,9 +11,9 @@ var Template = template.NewTemplate()
 func init()  {
 
 	ds := template.SYSDATA{
-		"http://192.168.14.253:8001/static/admin/",
-		"minggo  2017",
-		"http://192.168.14.253:8888/",
+		ConstTemplateSysdataStatic,
+		ConstTemplateSysdataPowerBy,
+		ConstTemplateSysdataPostUrl,
 	}
 
 	//Map_DefalutStatic := cmap.New()
@@ -25,11 +25,11 @@ func init()  {
 	//}
 
 	Template.Options = &template.Options{
-		Directory:"./src/cms/views/admin/",
-		Charset: "UTF-8", // Appends the given charset to the Content-Type header. Default is UTF-8
+		Directory:ConstTemplateOptionsDirectory,
+		Charset: ConstTemplateOptionsCharset, // Appends the given charset to the Content-Type header. Default is UTF-8
 		// Allows changing of output to XHTML instead of HTML. Default is "text/html"
-		HTMLContentType: "text/html",
-		Extension: ".html",
+		HTMLContentType: ConstTemplateOptionsHTMLContentType,
+		Extension: ConstTemplateOptionsExtension,
 	}
 	Template.TemplateData = &template.TemplateData{ds,nil}
 

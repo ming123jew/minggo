@@ -134,7 +134,7 @@ Purchase: http://wrapbootstrap.com
                     $.ajax({
                         contentType: 'application/x-www-form-urlencoded',
                         headers: Headers,
-                        url: BaseUrl+"admin/login?m=Jwt",
+                        url: BaseUrl+"admin/login",
                         async: true,
                         type: 'post',
                         data: JSON.stringify(sendData),
@@ -154,6 +154,7 @@ Purchase: http://wrapbootstrap.com
                                 }catch (err){
                                     $.cookie('LoginTokenStorage', e, { expires: 1, path: '/' });
                                 }
+                                //window.location.href = BaseUrl+"admin/index"
                             }else{
                                 try {
                                     sessionStorage.setItem("LoginTokenStorage", null);

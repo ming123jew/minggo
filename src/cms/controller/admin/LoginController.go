@@ -10,6 +10,7 @@ import (
 	"lib/o-jwt-go"
 	"time"
 	"lib/o-jwt-go/request"
+	"log"
 )
 
 
@@ -22,7 +23,12 @@ type Authentication struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
-func (own *LoginController)ServeHTTP(w http.ResponseWriter, r *http.Request)  {}
+
+type ReturnResponser struct {
+	State bool `json:"state"`
+	Message string `json:"message"`
+	Other interface{}
+}
 
 //登录页面显示
 func  (own *LoginController)GET(w http.ResponseWriter, r *http.Request)  {
@@ -76,31 +82,70 @@ func  (own *LoginController)GET(w http.ResponseWriter, r *http.Request)  {
 		mo,
 		},
 	)
-	Template.Html(w,r,"login",Template.TemplateData)
+	Template.Html(w,r,Template.TemplateData,"login",)
 	//s := mustache.RenderFileInLayout("./src/cms/views/admin/login.html", "./src/cms/views/admin/layout.html.mustache", nil)
 	//fmt.Fprintf(w,s)
 }
 
-//登录操作 | session
+//登录操作 | session | 返回json格式
 func (own *LoginController)POST(w http.ResponseWriter, r *http.Request)  {
+	var response ReturnResponser
+	//登录前检测
+	session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
+	log.Println("login:",session)
+	if session.Values[ConstSessionAdminLoginFlagValues]!=nil{
+		//log.Println("login success.")
+		//http.Redirect(w,r,"index",301)
+		response = ReturnResponser{true,"Userinfo From session.",nil}
+		ReturnJsonResponse(response,w)
+		return
+	}
+	var user Authentication
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		//w.WriteHeader(http.StatusForbidden)
+		//fmt.Fprint(w, "Error in request:",err)
 
+		response = ReturnResponser{false,"Error in request:",nil}
+		return
+	}
+
+	// Set some session values.
+	//session.Values["foo"] = "bar"
+	//session.Values[42] = 43
+	// Save it before we write to the response/return from the handler.
+	//session.Save(r, w)
+	model_AdminUser := new(model.AdminUser)
+	b,m,err := model_AdminUser.GetByUsernameAndPassword(user.Username,user.Password)
+	//fmt.Println(b,m)
+	if b==false{
+		response =  ReturnResponser{false,"Error in model:"+err.Error(),nil}
+	}else{
+		response = ReturnResponser{true,"success.",nil}
+		//验证成功
+		m_json,err :=  json.Marshal(m)
+		if err != nil {
+			log.Println("struct to json in error:",err)
+		}
+		session.Values[ConstSessionAdminLoginFlagValues] = m_json
+		session.Save(r, w)
+	}
+	ReturnJsonResponse(response,w)
 }
 
-//登录操作 | jwt
+//登录操作 | jwt | 返回json格式
 func  (own *LoginController)Jwt(w http.ResponseWriter, r *http.Request)  {
 	//登录前检测
 	token,ok := own.ValidateLoginToken(w,r)
-	fmt.Println(token,ok)
 	switch ok {
 	case true:
 		//fmt.Println("auth:",ok,"\n token:",token,"\n token claims:",token.Claims.(jwt.MapClaims)[AdminLoginFlag],"\n",token.Signature)
-		j,err := json.Marshal(token.Claims.(jwt.MapClaims)[AdminLoginFlag]) //map 转 json
+		j,err := json.Marshal(token.Claims.(jwt.MapClaims)[ConstSessionAdminLoginFlag]) //map 转 json
 		var user model.AdminUser
 		json.Unmarshal(j,&user)//json 传到 struct
 		if err!=nil{
-			fmt.Println(err)
+			log.Println(err)
 		}
-		fmt.Println(user)
 	case false:
 		var user Authentication
 		var response JwtToken
@@ -116,11 +161,11 @@ func  (own *LoginController)Jwt(w http.ResponseWriter, r *http.Request)  {
 		//fmt.Println(user.Username)
 		//fmt.Println(user.Password)
 		model_AdminUser := new(model.AdminUser)
-		h,m,err := model_AdminUser.GetByUsernameAndPassword(user.Username,user.Password)
-		fmt.Println(h,m)
-		if h==false{
+		b,m,err := model_AdminUser.GetByUsernameAndPassword(user.Username,user.Password)
+		if b==false{
 			//fmt.Fprintf(w,"Error in username or password")
 			response = JwtToken{false,"","Error in username or password"}
+
 		}else{
 			//jwt token 加密操作
 		//iss: jwt签发者
@@ -134,9 +179,9 @@ func  (own *LoginController)Jwt(w http.ResponseWriter, r *http.Request)  {
 			claims := make(jwt.MapClaims)
 			claims["exp"] = time.Now().Add(time.Second * time.Duration(1800)).Unix()//time.Now().Add(time.Hour * time.Duration(1)).Unix()
 			claims["iat"] = time.Now().Unix()
-			claims[AdminLoginFlag] = m
+			claims[ConstSessionAdminLoginFlag] = m
 			token.Claims = claims
-			tokenString, err := token.SignedString([]byte(JwtSecretKey))
+			tokenString, err := token.SignedString([]byte(ConstJwtSecretKey))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				//fmt.Fprintln(w, "Error while signing the token")
@@ -151,7 +196,7 @@ func  (own *LoginController)Jwt(w http.ResponseWriter, r *http.Request)  {
 
 func (own *LoginController)ValidateLoginToken(w http.ResponseWriter, r *http.Request)(*jwt.Token,bool){
 	var b bool
-	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {return []byte(JwtSecretKey), nil})
+	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {return []byte(ConstJwtSecretKey), nil})
 	if err == nil {
 		if token.Valid {
 			//fmt.Fprint(w, "Token is true.")
@@ -175,6 +220,12 @@ func (own *LoginController)Main(w http.ResponseWriter, r *http.Request)  {
 }
 
 
+func (own *LoginController)Out(w http.ResponseWriter, r *http.Request){
+	session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
+	session.Values[ConstSessionAdminLoginFlagValues]=nil
+	session.Save(r,w)
+	http.Redirect(w,r,"login",200)
 
+}
 
 

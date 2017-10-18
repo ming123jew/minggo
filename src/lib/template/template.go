@@ -42,9 +42,11 @@ func NewTemplate(arg ...string) *MingGoTemplate  {
 	}
 }
 
-func (self *MingGoTemplate)Html(w http.ResponseWriter,r *http.Request,name string,templateData interface{})  {
-
-	t,error:=template.ParseFiles(self.Options.Directory+name+self.Options.Extension)//New("login.html")
+func (self *MingGoTemplate)Html(w http.ResponseWriter,r *http.Request,templateData interface{},names ...string,)  {
+	for key,v:=range names{
+		names[key] = self.Options.Directory+v+self.Options.Extension
+	}
+	t,error:=template.ParseFiles(names...)//New("login.html")
 	if error!=nil{
 		fmt.Fprintf(w,error.Error())
 		return
