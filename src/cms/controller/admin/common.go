@@ -54,20 +54,23 @@ type SessionIsLoginer []string
 //根据session进行验证
 func (own SessionIsLoginer)IsLogin(next http.HandlerFunc,gourl ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//验证页面 防止缓存
+		w.Header().Set("Cache-Control","no-cache")
+		w.Header().Set("Pragma","no-cache")
+		w.Header().Set("Expires", "0")
 		session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
 		userinfo_json := session.Values[ConstSessionAdminLoginFlagValues]
-		log.Println(session)
 		if userinfo_json!= nil{
 			json.Unmarshal(userinfo_json.([]byte),&LoginUserInfo)//json 传到 struct
-			log.Println(LoginUserInfo)
+			//log.Println(LoginUserInfo)
 			next(w,r)
 		}else{
 			if gourl[0]!=""{
-				fmt.Fprintf(w,"Unauthorized access to this resource. Please login system.\n")
-				http.Redirect(w,r,gourl[0],200)
+				//fmt.Fprintf(w,"Unauthorized access to this resource. Please login system.\n")
+				http.Redirect(w,r,gourl[0],301)
 			}else{
 				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprint(w, "Unauthorized access to this resource. \nError: login failed.")
+				fmt.Fprint(w, "Unauthorized access to this resource. \nMessage: login failed.")
 			}
 
 		}
@@ -108,4 +111,8 @@ func ReturnJsonResponse(response interface{}, w http.ResponseWriter) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
+}
+
+func End()  {
+	log.Println("end")
 }

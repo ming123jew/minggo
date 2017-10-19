@@ -16,7 +16,7 @@ func init()  {
 	//AuthorizationSession.IsLogin|AuthorizationJwt.IsLogin
 	Route = map[string] interface{}{
 		"/admin/login": server.HttpFunc(DefaultHttpFunc,&LoginController{}) ,
-		"/admin/index": AuthorizationSession.IsLogin(RbacFunc(server.HttpFunc(DefaultHttpFunc,&Index{})),"login") ,
+		"/admin/index": AuthorizationSession.IsLogin( RbacFunc( server.HttpFunc( DefaultHttpFunc,&Index{} ) ),"login" ) ,
 		"/admin/test": &AdminController{} ,
 	}
 }

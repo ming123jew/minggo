@@ -92,11 +92,11 @@ func (own *LoginController)POST(w http.ResponseWriter, r *http.Request)  {
 	var response ReturnResponser
 	//登录前检测
 	session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
-	log.Println("login:",session)
+	//log.Println("login:",session)
 	if session.Values[ConstSessionAdminLoginFlagValues]!=nil{
 		//log.Println("login success.")
 		//http.Redirect(w,r,"index",301)
-		response = ReturnResponser{true,"Userinfo From session.",nil}
+		response = ReturnResponser{true,"Userinfo from session.",nil}
 		ReturnJsonResponse(response,w)
 		return
 	}
@@ -105,8 +105,8 @@ func (own *LoginController)POST(w http.ResponseWriter, r *http.Request)  {
 	if err != nil {
 		//w.WriteHeader(http.StatusForbidden)
 		//fmt.Fprint(w, "Error in request:",err)
-
-		response = ReturnResponser{false,"Error in request:",nil}
+		log.Println("Error in request: error in username or password. \nmessage:",err)
+		response = ReturnResponser{false,"Error in request: error in username or password.",nil}
 		return
 	}
 
@@ -119,13 +119,13 @@ func (own *LoginController)POST(w http.ResponseWriter, r *http.Request)  {
 	b,m,err := model_AdminUser.GetByUsernameAndPassword(user.Username,user.Password)
 	//fmt.Println(b,m)
 	if b==false{
-		response =  ReturnResponser{false,"Error in model:"+err.Error(),nil}
+		response =  ReturnResponser{false,"Error in username or password.",nil}
 	}else{
 		response = ReturnResponser{true,"success.",nil}
 		//验证成功
 		m_json,err :=  json.Marshal(m)
 		if err != nil {
-			log.Println("struct to json in error:",err)
+			log.Println("error in struct to json.  \nmessage:",err)
 		}
 		session.Values[ConstSessionAdminLoginFlagValues] = m_json
 		session.Save(r, w)
@@ -221,10 +221,14 @@ func (own *LoginController)Main(w http.ResponseWriter, r *http.Request)  {
 
 
 func (own *LoginController)Out(w http.ResponseWriter, r *http.Request){
+	//验证页面 防止缓存
+	w.Header().Set("Cache-Control","no-cache")
+	w.Header().Set("Pragma","no-cache")
+	w.Header().Set("Expires", "0")
 	session, _ := Session.Get(r,ConstSessionAdminLoginFlag)
 	session.Values[ConstSessionAdminLoginFlagValues]=nil
 	session.Save(r,w)
-	http.Redirect(w,r,"login",200)
+	http.Redirect(w,r,"login",301)
 
 }
 
