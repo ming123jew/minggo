@@ -19,9 +19,7 @@ func init()  {
 //import "./src/server"
 func main()  {
 	initModel()
-
 	initHttp()
-
 	//println(runtime.NumCPU())
 	//runtime.GOMAXPROCS(1)
 /*	for {
@@ -29,7 +27,6 @@ func main()  {
 		fmt.Print(1)
 		//time.Sleep(1*time.Second)
 	}*/
-
 }
 
 //启动http服务

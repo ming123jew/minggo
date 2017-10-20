@@ -1,146 +1,69 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"bytes"
 	"log"
-	"net/http"
-	"strings"
 	"time"
 
-	"github.com/codegangsta/negroni"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dgrijalva/jwt-go/request"
+	"github.com/streadway/amqp"
 )
 
-const (
-	SecretKey = "welcome to wangshubo's blog"
-)
-
-func fatal(err error) {
+func failOnError(err error, msg string) {
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s: %s", msg, err)
 	}
-}
-
-type UserCredentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type User struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type Response struct {
-	Data string `json:"data"`
-}
-
-type Token struct {
-	Token string `json:"token"`
-}
-
-func StartServer() {
-
-	http.HandleFunc("/login", LoginHandler)
-
-	http.Handle("/resource", negroni.New(
-		negroni.HandlerFunc(ValidateTokenMiddleware),
-		negroni.Wrap(http.HandlerFunc(ProtectedHandler)),
-	))
-
-	log.Println("Now listening...")
-	http.ListenAndServe(":8077", nil)
 }
 
 func main() {
-	StartServer()
-}
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
 
-func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
 
-	response := Response{"Gained access to protected resource"}
-	JsonResponse(response, w)
+	q, err := ch.QueueDeclare(
+		"task_queue", // name
+		true,         // durable
+		false,        // delete when unused
+		false,        // exclusive
+		false,        // no-wait
+		nil,          // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
 
-}
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var user UserCredentials
-	err := json.NewDecoder(r.Body).Decode(&user)
-	fmt.Println(r.Body)
-	fmt.Println(json.NewDecoder(r.Body).Decode(&user))
-	if err != nil {
-		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprint(w, "Error in request",err)
-		return
-	}
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		false,  // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	failOnError(err, "Failed to register a consumer")
 
-	if strings.ToLower(user.Username) != "someone" {
-		if user.Password != "p@ssword" {
-			w.WriteHeader(http.StatusForbidden)
-			fmt.Println("Error logging in")
-			fmt.Fprint(w, "Invalid credentials")
-			return
+	forever := make(chan bool)
+
+	go func() {
+		for d := range msgs {
+			log.Printf("Received a message: %s", d.Body)
+			dot_count := bytes.Count(d.Body, []byte("."))
+			t := time.Duration(dot_count)
+			time.Sleep(t * time.Second)
+			log.Printf("Done")
+			d.Ack(false)
 		}
-	}
+	}()
 
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := make(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix()
-	claims["iat"] = time.Now().Unix()
-	token.Claims = claims
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Error extracting the key")
-		fatal(err)
-	}
-
-	tokenString, err := token.SignedString([]byte(SecretKey))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Error while signing the token")
-		fatal(err)
-	}
-
-	response := Token{tokenString}
-	JsonResponse(response, w)
-
-}
-
-func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-
-	token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor,
-		func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-
-	if err == nil {
-		if token.Valid {
-			next(w, r)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprint(w, "Token is not valid")
-		}
-	} else {
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "Unauthorized access to this resource")
-	}
-
-}
-
-func JsonResponse(response interface{}, w http.ResponseWriter) {
-
-	json, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	<-forever
 }
